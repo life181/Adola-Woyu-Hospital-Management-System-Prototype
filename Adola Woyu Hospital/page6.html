@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Staff | Adola Woyu Hospital</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body { background: #f4f8fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif;}
+    .navbar { display: flex; align-items: center; background: #2f8e85; color: #fff; padding: 1rem 1.5rem;}
+    .navbar-logo { font-weight: bold; font-size: 1.2rem; margin-right: 2rem; letter-spacing: 0.5px;}
+    .navbar-links a { color: #fff; text-decoration: none; margin: 0 1rem; font-size: 1rem;}
+    .navbar-links a.active, .navbar-links a:hover { text-decoration: underline;}
+    .navbar-user { margin-left: auto; font-size: 1rem; opacity: 0.9;}
+    .container { max-width: 900px; margin: 2rem auto; background: #fff; border-radius: 9px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); padding: 2rem;}
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap;}
+    .page-header h2 { font-size: 1.5rem; color: #2f8e85; margin: 0;}
+    .add-btn { background: #2f8e85; color: #fff; border: none; padding: 0.65rem 1.2rem; border-radius: 6px; font-size: 1rem; cursor: pointer; font-weight: bold;}
+    .add-btn:hover { background: #246a63;}
+    .staff-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem;}
+    .staff-table th, .staff-table td { border: 1px solid #e0e7ef; padding: 0.7rem; text-align: left; font-size: 1rem;}
+    .staff-table th { background: #f6fcfa; color: #2f8e85; font-weight: bold;}
+    .staff-table tr:nth-child(even) { background: #f9fafc;}
+    .action-btn { background: #f3f7fb; border: none; color: #2f8e85; padding: 0.4rem 0.8rem; border-radius: 4px; margin-right: 0.4rem; cursor: pointer;}
+    .action-btn:hover { background: #e6f8f6;}
+    /* Modal styles */
+    .modal-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(44, 62, 80, 0.18); display: flex; align-items: center; justify-content: center; z-index: 1000; display: none;}
+    .modal { background: #fff; border-radius: 8px; box-shadow: 0 2px 16px rgba(0,0,0,0.13); padding: 2rem 1.5rem 1.2rem 1.5rem; width: 94vw; max-width: 410px; position: relative;}
+    .modal h3 { margin-top: 0; color: #2f8e85; margin-bottom: 1rem;}
+    .modal label { display: block; margin-bottom: 0.2rem; font-size: 0.98rem; color: #4e7a7b; margin-top: 0.9rem;}
+    .modal input, .modal select { width: 100%; padding: 0.59rem; margin-bottom: 0.7rem; border: 1px solid #cfd8dc; border-radius: 6px; font-size: 1rem; background: #f9fafc;}
+    .modal-actions { display: flex; justify-content: flex-end; gap: 1rem;}
+    .close-modal { position: absolute; top: 0.7rem; right: 1rem; font-size: 1.2rem; background: none; border: none; color: #2f8e85; cursor: pointer;}
+    @media (max-width: 700px) {
+      .container { padding: 1rem 0.4rem; margin: 1rem 0.2rem;}
+      .navbar { flex-direction: column; align-items: flex-start; padding: 0.8rem;}
+      .navbar-logo { margin-bottom: 0.6rem;}
+      .page-header { flex-direction: column; align-items: flex-start; gap: 1rem;}
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+ <nav class="navbar">
+  <span class="navbar-logo">AW</span>
+  <div class="navbar-links">
+    <a href="page1.html">Home</a>
+    <a href="page2.html">Dashboard</a>
+    <a href="page3.html">Patients</a>
+    <a href="page4.html">Appointments</a>
+    <a href="page5.html">Billing</a>
+    <a href="page6.html" class="active">Staff</a>
+    <a href="page7.html">Messages</a>
+    <a href="page8.html">Prescription</a>
+    <a href="page9.html">Certificate</a>
+    <a href="page10.html">Referral</a>
+    <a href="page11.html">Settings</a>
+    <a href="page12.html">System Admin</a>
+  </div>
+  <div class="navbar-user" id="navbarUser"></div>
+</nav>
+<script>
+  function getUsername() { return localStorage.getItem('username') || "User"; }
+  function getRole() { return localStorage.getItem('role') || "Staff"; }
+  document.getElementById('navbarUser').innerHTML = getUsername() + " (" + getRole() + ') &nbsp;|&nbsp; <a href="index.html" style="color:#fff;text-decoration:underline;">Logout</a>';
+</script>
+  function getUsername() { return localStorage.getItem('username') || "User"; }
+  function getRole() { return localStorage.getItem('role') || "Staff"; }
+  document.getElementById('navbarUser').innerHTML = getUsername() + " (" + getRole() + ') &nbsp;|&nbsp; <a href="index.html" style="color:#fff;text-decoration:underline;">Logout</a>';
+</script>
+  <div class="container">
+    <div class="page-header">
+      <h2>Staff Management</h2>
+      <button class="add-btn" id="addStaffBtn">+ Add Staff</button>
+    </div>
+    <table class="staff-table" id="staffTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Role</th>
+          <th>Contact</th>
+          <th>Department</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Populated by JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal for Add/Edit Staff -->
+  <div class="modal-bg" id="staffModalBg">
+    <div class="modal">
+      <button class="close-modal" id="closeStaffModal">&times;</button>
+      <h3 id="staffModalTitle">Add Staff</h3>
+      <form id="staffForm">
+        <input type="hidden" id="staffIndex">
+        <label for="sName">Full Name</label>
+        <input type="text" id="sName" required>
+        <label for="sRole">Role</label>
+        <select id="sRole" required>
+          <option value="Doctor">Doctor</option>
+          <option value="Nurse">Nurse</option>
+          <option value="Receptionist">Receptionist</option>
+          <option value="Admin">Admin</option>
+        </select>
+        <label for="sContact">Contact</label>
+        <input type="text" id="sContact" required>
+        <label for="sDepartment">Department</label>
+        <input type="text" id="sDepartment" required>
+        <label for="sStatus">Status</label>
+        <select id="sStatus" required>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+        <div class="modal-actions">
+          <button type="submit" class="add-btn" id="saveStaffBtn">Save</button>
+          <button type="button" class="action-btn" id="cancelStaffBtn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+    // Demo data
+    let staff = [
+      { name: "Dr. Example", role: "Doctor", contact: "0911222333", department: "General", status: "Active" },
+      { name: "Marta Tulu", role: "Nurse", contact: "0933445566", department: "Pediatrics", status: "Active" }
+    ];
+
+    const tableBody = document.querySelector('#staffTable tbody');
+    const modalBg = document.getElementById('staffModalBg');
+    const addBtn = document.getElementById('addStaffBtn');
+    const closeModalBtn = document.getElementById('closeStaffModal');
+    const staffForm = document.getElementById('staffForm');
+    const modalTitle = document.getElementById('staffModalTitle');
+    const staffIndex = document.getElementById('staffIndex');
+    const cancelStaffBtn = document.getElementById('cancelStaffBtn');
+
+    function renderStaff() {
+      tableBody.innerHTML = '';
+      staff.forEach((s, i) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${s.name}</td>
+          <td>${s.role}</td>
+          <td>${s.contact}</td>
+          <td>${s.department}</td>
+          <td>${s.status}</td>
+          <td>
+            <button class="action-btn" onclick="editStaff(${i})">Edit</button>
+            <button class="action-btn" onclick="deleteStaff(${i})">Delete</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    window.editStaff = function(index) {
+      const s = staff[index];
+      staffIndex.value = index;
+      document.getElementById('sName').value = s.name;
+      document.getElementById('sRole').value = s.role;
+      document.getElementById('sContact').value = s.contact;
+      document.getElementById('sDepartment').value = s.department;
+      document.getElementById('sStatus').value = s.status;
+      modalTitle.textContent = "Edit Staff";
+      modalBg.style.display = "flex";
+    }
+
+    window.deleteStaff = function(index) {
+      if (confirm('Are you sure you want to delete this staff member?')) {
+        staff.splice(index, 1);
+        renderStaff();
+      }
+    }
+
+    addBtn.onclick = () => {
+      staffIndex.value = "";
+      staffForm.reset();
+      modalTitle.textContent = "Add Staff";
+      modalBg.style.display = "flex";
+    }
+    closeModalBtn.onclick = cancelStaffBtn.onclick = () => {
+      modalBg.style.display = "none";
+    }
+
+    staffForm.onsubmit = function(e) {
+      e.preventDefault();
+      const data = {
+        name: document.getElementById('sName').value,
+        role: document.getElementById('sRole').value,
+        contact: document.getElementById('sContact').value,
+        department: document.getElementById('sDepartment').value,
+        status: document.getElementById('sStatus').value
+      };
+      if (staffIndex.value === "") {
+        staff.push(data);
+      } else {
+        staff[staffIndex.value] = data;
+      }
+      renderStaff();
+      modalBg.style.display = "none";
+    }
+
+    // Initial render
+    renderStaff();
+  </script>
+</body>
+</html>

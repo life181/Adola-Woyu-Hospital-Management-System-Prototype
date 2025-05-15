@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>System Admin | Adola Woyu Hospital</title>
+  <style>
+    body { background: #f4f8fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif;}
+    .navbar { display: flex; align-items: center; background: #2f8e85; color: #fff; padding: 1rem 1.5rem;}
+    .navbar-logo { font-weight: bold; font-size: 1.2rem; margin-right: 2rem; letter-spacing: 0.5px;}
+    .navbar-links a { color: #fff; text-decoration: none; margin: 0 1rem; font-size: 1rem;}
+    .navbar-links a.active, .navbar-links a:hover { text-decoration: underline;}
+    .navbar-user { margin-left: auto; font-size: 1rem; opacity: 0.9;}
+    .container { max-width: 1100px; margin: 2rem auto; padding: 2rem; background: #fff; border-radius: 10px; box-shadow: 0 2px 16px rgba(0,0,0,0.07);}
+    h2 { color: #2f8e85; margin-bottom: 1.5rem;}
+    .admin-section { margin-bottom: 2.2rem; }
+    .admin-section h3 { color: #246a63; margin-bottom: 0.7rem; font-size: 1.13rem;}
+    .users-table, .logs-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem;}
+    .users-table th, .users-table td,
+    .logs-table th, .logs-table td { border: 1px solid #e0e7ef; padding: 0.65rem; text-align: left; font-size: 1rem;}
+    .users-table th, .logs-table th { background: #f6fcfa; color: #2f8e85;}
+    .users-table tr:nth-child(even), .logs-table tr:nth-child(even) { background: #f9fafc;}
+    .action-btn { background: #f3f7fb; border: none; color: #2f8e85; padding: 0.4rem 0.8rem; border-radius: 4px; margin-right: 0.4rem; cursor: pointer;}
+    .action-btn:hover { background: #e6f8f6;}
+    .add-btn { background: #2f8e85; color: #fff; border: none; padding: 0.45rem 1.1rem; border-radius: 6px; font-size: 1rem; cursor: pointer; font-weight: bold;}
+    .add-btn:hover { background: #246a63;}
+    .modal-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(44, 62, 80, 0.18); display: flex; align-items: center; justify-content: center; z-index: 1000; display: none;}
+    .modal { background: #fff; border-radius: 8px; box-shadow: 0 2px 16px rgba(0,0,0,0.13); padding: 2rem 1.5rem 1.2rem 1.5rem; width: 94vw; max-width: 410px; position: relative;}
+    .close-modal { position: absolute; top: 0.7rem; right: 1rem; font-size: 1.2rem; background: none; border: none; color: #2f8e85; cursor: pointer;}
+    .modal label { display: block; margin-bottom: 0.2rem; font-size: 0.98rem; color: #4e7a7b; margin-top: 0.9rem;}
+    .modal input, .modal select { width: 100%; padding: 0.59rem; margin-bottom: 0.7rem; border: 1px solid #cfd8dc; border-radius: 6px; font-size: 1rem; background: #f9fafc;}
+    .modal-actions { display: flex; justify-content: flex-end; gap: 1rem;}
+    @media (max-width: 700px) {
+      .container { padding: 1rem 0.4rem; margin: 1rem 0.2rem;}
+      .navbar { flex-direction: column; align-items: flex-start; padding: 0.8rem;}
+      .navbar-logo { margin-bottom: 0.6rem;}
+    }
+  </style>
+</head>
+<body>
+ <nav class="navbar">
+  <span class="navbar-logo">AW</span>
+  <div class="navbar-links">
+    <a href="page1.html">Home</a>
+    <a href="page2.html">Dashboard</a>
+    <a href="page3.html">Patients</a>
+    <a href="page4.html">Appointments</a>
+    <a href="page5.html">Billing</a>
+    <a href="page6.html">Staff</a>
+    <a href="page7.html">Messages</a>
+    <a href="page8.html">Prescription</a>
+    <a href="page9.html">Certificate</a>
+    <a href="page10.html">Referral</a>
+    <a href="page11.html">Settings</a>
+    <a href="page12.html" class="active">System Admin</a>
+  </div>
+  <div class="navbar-user" id="navbarUser"></div>
+</nav>
+<script>
+  function getUsername() { return localStorage.getItem('username') || "User"; }
+  function getRole() { return localStorage.getItem('role') || "Staff"; }
+  document.getElementById('navbarUser').innerHTML = getUsername() + " (" + getRole() + ') &nbsp;|&nbsp; <a href="index.html" style="color:#fff;text-decoration:underline;">Logout</a>';
+</script>
+  <div class="container">
+    <h2>System Administration</h2>
+    <div class="admin-section">
+      <h3>Users & Roles</h3>
+      <button class="add-btn" id="addUserBtn">+ Add User</button>
+      <table class="users-table" id="usersTable">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+    <div class="admin-section">
+      <h3>System Logs</h3>
+      <table class="logs-table" id="logsTable">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>User</th>
+            <th>Event</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <!-- Modal for Add/Edit User -->
+  <div class="modal-bg" id="userModalBg">
+    <div class="modal">
+      <button class="close-modal" id="closeUserModal">&times;</button>
+      <h3 id="userModalTitle">Add User</h3>
+      <form id="userForm">
+        <input type="hidden" id="userIndex">
+        <label for="uName">Username</label>
+        <input type="text" id="uName" required>
+        <label for="uEmail">Email</label>
+        <input type="email" id="uEmail" required>
+        <label for="uRole">Role</label>
+        <select id="uRole" required>
+          <option value="admin1">Admin 1</option>
+          <option value="admin2">Admin 2</option>
+          <option value="admin3">Admin 3</option>
+          <option value="admin4">Admin 4</option>
+          <option value="doctor">Doctor</option>
+          <option value="diagnosis">Diagnosis Doctor</option>
+          <option value="ultrasound">Ultrasound</option>
+          <option value="nurse">Nurse</option>
+          <option value="pharmacy">Pharmacy</option>
+          <option value="laboratory">Laboratory</option>
+          <option value="receptionist">Receptionist</option>
+          <option value="other">Other</option>
+        </select>
+        <label for="uStatus">Status</label>
+        <select id="uStatus" required>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+        <div class="modal-actions">
+          <button type="submit" class="add-btn">Save</button>
+          <button type="button" class="action-btn" id="cancelUserBtn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+    function getUsername() {
+      return localStorage.getItem('username') || "User";
+    }
+    function getRole() {
+      return localStorage.getItem('role') || "Staff";
+    }
+    document.getElementById('navbarUser').innerHTML = getUsername() + " (" + getRole() + ') &nbsp;|&nbsp; <a href="index.html" style="color:#fff;text-decoration:underline;">Logout</a>';
+
+    // Demo users
+    let users = JSON.parse(localStorage.getItem('sys_users')) || [
+      {name:"admin", email:"admin@hospital.com", role:"admin1", status:"Active"},
+      {name:"doctor1", email:"doctor1@hospital.com", role:"doctor", status:"Active"},
+      {name:"nurse1", email:"nurse1@hospital.com", role:"nurse", status:"Inactive"}
+    ];
+    let logs = JSON.parse(localStorage.getItem('sys_logs')) || [
+      {time:"2025-05-12 10:00", user:"admin", event:"Created system backup"},
+      {time:"2025-05-12 11:20", user:"doctor1", event:"Added a new patient"}
+    ];
+
+    const usersTable = document.getElementById('usersTable').querySelector('tbody');
+    const logsTable = document.getElementById('logsTable').querySelector('tbody');
+    const addUserBtn = document.getElementById('addUserBtn');
+    const userModalBg = document.getElementById('userModalBg');
+    const closeUserModal = document.getElementById('closeUserModal');
+    const userModalTitle = document.getElementById('userModalTitle');
+    const userForm = document.getElementById('userForm');
+    const userIndex = document.getElementById('userIndex');
+    const cancelUserBtn = document.getElementById('cancelUserBtn');
+
+    function renderUsers() {
+      usersTable.innerHTML = '';
+      users.forEach((u, i) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${u.name}</td>
+          <td>${u.role}</td>
+          <td>${u.email}</td>
+          <td>${u.status}</td>
+          <td>
+            <button class="action-btn" onclick="editUser(${i})">Edit</button>
+            <button class="action-btn" onclick="deleteUser(${i})">Delete</button>
+          </td>`;
+        usersTable.appendChild(row);
+      });
+    }
+
+    function renderLogs() {
+      logsTable.innerHTML = '';
+      logs.forEach(l => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${l.time}</td><td>${l.user}</td><td>${l.event}</td>`;
+        logsTable.appendChild(row);
+      });
+    }
+
+    window.editUser = function(index) {
+      const u = users[index];
+      userIndex.value = index;
+      document.getElementById('uName').value = u.name;
+      document.getElementById('uEmail').value = u.email;
+      document.getElementById('uRole').value = u.role;
+      document.getElementById('uStatus').value = u.status;
+      userModalTitle.textContent = "Edit User";
+      userModalBg.style.display = "flex";
+    }
+
+    window.deleteUser = function(index) {
+      if (confirm('Are you sure you want to delete this user?')) {
+        logs.unshift({time: new Date().toISOString().slice(0,16).replace("T"," "), user:getUsername(), event:"Deleted user "+users[index].name});
+        users.splice(index, 1);
+        saveData();
+        renderUsers();
+        renderLogs();
+      }
+    }
+
+    addUserBtn.onclick = () => {
+      userIndex.value = "";
+      userForm.reset();
+      userModalTitle.textContent = "Add User";
+      userModalBg.style.display = "flex";
+    }
+    closeUserModal.onclick = cancelUserBtn.onclick = () => {
+      userModalBg.style.display = "none";
+    }
+
+    userForm.onsubmit = function(e) {
+      e.preventDefault();
+      const data = {
+        name: document.getElementById('uName').value,
+        email: document.getElementById('uEmail').value,
+        role: document.getElementById('uRole').value,
+        status: document.getElementById('uStatus').value
+      };
+      if (userIndex.value === "") {
+        users.push(data);
+        logs.unshift({time: new Date().toISOString().slice(0,16).replace("T"," "), user:getUsername(), event:"Added user "+data.name});
+      } else {
+        users[userIndex.value] = data;
+        logs.unshift({time: new Date().toISOString().slice(0,16).replace("T"," "), user:getUsername(), event:"Edited user "+data.name});
+      }
+      saveData();
+      renderUsers();
+      renderLogs();
+      userModalBg.style.display = "none";
+    }
+
+    function saveData() {
+      localStorage.setItem('sys_users', JSON.stringify(users));
+      localStorage.setItem('sys_logs', JSON.stringify(logs));
+    }
+
+    // Initial render
+    renderUsers();
+    renderLogs();
+  </script>
+</body>
+</html>

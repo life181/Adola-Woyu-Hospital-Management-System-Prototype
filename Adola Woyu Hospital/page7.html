@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Messages | Adola Woyu Hospital</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body { background: #f4f8fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif;}
+    .navbar { display: flex; align-items: center; background: #2f8e85; color: #fff; padding: 1rem 1.5rem;}
+    .navbar-logo { font-weight: bold; font-size: 1.2rem; margin-right: 2rem; letter-spacing: 0.5px;}
+    .navbar-links a { color: #fff; text-decoration: none; margin: 0 1rem; font-size: 1rem;}
+    .navbar-links a.active, .navbar-links a:hover { text-decoration: underline;}
+    .navbar-user { margin-left: auto; font-size: 1rem; opacity: 0.9;}
+    .container { max-width: 900px; margin: 2rem auto; background: #fff; border-radius: 9px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); padding: 2rem;}
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap;}
+    .page-header h2 { font-size: 1.5rem; color: #2f8e85; margin: 0;}
+    .add-btn { background: #2f8e85; color: #fff; border: none; padding: 0.65rem 1.2rem; border-radius: 6px; font-size: 1rem; cursor: pointer; font-weight: bold;}
+    .add-btn:hover { background: #246a63;}
+    .messages-table { width: 100%; border-collapse: collapse;}
+    .messages-table th, .messages-table td { border: 1px solid #e0e7ef; padding: 0.7rem; text-align: left; font-size: 1rem;}
+    .messages-table th { background: #f6fcfa; color: #2f8e85; font-weight: bold;}
+    .messages-table tr:nth-child(even) { background: #f9fafc;}
+    .case-link { color: #246a63; text-decoration: underline; cursor: pointer;}
+    /* Modal styles */
+    .modal-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(44, 62, 80, 0.18); display: flex; align-items: center; justify-content: center; z-index: 1000; display: none;}
+    .modal { background: #fff; border-radius: 8px; box-shadow: 0 2px 16px rgba(0,0,0,0.13); padding: 2rem 1.5rem 1.2rem 1.5rem; width: 94vw; max-width: 410px; position: relative;}
+    .modal h3 { margin-top: 0; color: #2f8e85; margin-bottom: 1rem;}
+    .modal label { display: block; margin-bottom: 0.2rem; font-size: 0.98rem; color: #4e7a7b; margin-top: 0.9rem;}
+    .modal input, .modal select, .modal textarea { width: 100%; padding: 0.59rem; margin-bottom: 0.7rem; border: 1px solid #cfd8dc; border-radius: 6px; font-size: 1rem; background: #f9fafc;}
+    .modal-actions { display: flex; justify-content: flex-end; gap: 1rem;}
+    .close-modal { position: absolute; top: 0.7rem; right: 1rem; font-size: 1.2rem; background: none; border: none; color: #2f8e85; cursor: pointer;}
+    @media (max-width: 700px) {
+      .container { padding: 1rem 0.4rem; margin: 1rem 0.2rem;}
+      .navbar { flex-direction: column; align-items: flex-start; padding: 0.8rem;}
+      .navbar-logo { margin-bottom: 0.6rem;}
+      .page-header { flex-direction: column; align-items: flex-start; gap: 1rem;}
+    }
+  </style>
+</head>
+<body>
+ <nav class="navbar">
+  <span class="navbar-logo">AW</span>
+  <div class="navbar-links">
+    <a href="page1.html">Home</a>
+    <a href="page2.html">Dashboard</a>
+    <a href="page3.html">Patients</a>
+    <a href="page4.html">Appointments</a>
+    <a href="page5.html">Billing</a>
+    <a href="page6.html">Staff</a>
+    <a href="page7.html" class="active">Messages</a>
+    <a href="page8.html">Prescription</a>
+    <a href="page9.html">Certificate</a>
+    <a href="page10.html">Referral</a>
+    <a href="page11.html">Settings</a>
+    <a href="page12.html">System Admin</a>
+  </div>
+  <div class="navbar-user" id="navbarUser"></div>
+</nav>
+<script>
+  function getUsername() { return localStorage.getItem('username') || "User"; }
+  function getRole() { return localStorage.getItem('role') || "Staff"; }
+  document.getElementById('navbarUser').innerHTML = getUsername() + " (" + getRole() + ') &nbsp;|&nbsp; <a href="index.html" style="color:#fff;text-decoration:underline;">Logout</a>';
+</script>
+  <div class="container">
+    <div class="page-header">
+      <h2>Messages & Case Sharing</h2>
+      <button class="add-btn" id="newMessageBtn">+ New Message</button>
+    </div>
+    <table class="messages-table" id="messagesTable">
+      <thead>
+        <tr>
+          <th>From</th>
+          <th>To</th>
+          <th>Message</th>
+          <th>Patient Case</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Populated by JS -->
+      </tbody>
+    </table>
+  </div>
+  <!-- Modal for sending a message/case -->
+  <div class="modal-bg" id="messageModalBg">
+    <div class="modal">
+      <button class="close-modal" id="closeMessageModal">&times;</button>
+      <h3>Send Message / Share Case</h3>
+      <form id="messageForm">
+        <label for="msgTo">To (Role)</label>
+        <select id="msgTo" required>
+          <option value="admin1">Admin 1</option>
+          <option value="admin2">Admin 2</option>
+          <option value="admin3">Admin 3</option>
+          <option value="admin4">Admin 4</option>
+          <option value="doctor">Doctor</option>
+          <option value="diagnosis">Diagnosis Doctor</option>
+          <option value="ultrasound">Ultrasound</option>
+          <option value="nurse">Nurse</option>
+          <option value="pharmacy">Pharmacy</option>
+          <option value="laboratory">Laboratory</option>
+          <option value="receptionist">Receptionist</option>
+          <option value="other">Other</option>
+        </select>
+        <label for="msgText">Message</label>
+        <textarea id="msgText" rows="2" required></textarea>
+        <label for="msgPatient">Attach Patient (optional)</label>
+        <input type="text" id="msgPatient" placeholder="Patient Name">
+        <div class="modal-actions">
+          <button type="submit" class="add-btn">Send</button>
+          <button type="button" class="action-btn" id="cancelMessageBtn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+    // Demo: in a real app, these would be loaded per user/role and persisted server-side
+    let messages = [
+      {from: "laboratory", to: "doctor", text: "Lab results for Alemu Kebede are ready.", patient: "Alemu Kebede", date: "2025-05-10 11:00"},
+      {from: "doctor", to: "pharmacy", text: "Please prepare prescription for Sara Daba.", patient: "Sara Daba", date: "2025-05-10 11:20"}
+    ];
+
+    const tableBody = document.querySelector('#messagesTable tbody');
+    const modalBg = document.getElementById('messageModalBg');
+    const newMsgBtn = document.getElementById('newMessageBtn');
+    const closeModalBtn = document.getElementById('closeMessageModal');
+    const messageForm = document.getElementById('messageForm');
+    const cancelMessageBtn = document.getElementById('cancelMessageBtn');
+
+    function renderMessages() {
+      tableBody.innerHTML = '';
+      messages.forEach((m, i) => {
+        const patientCase = m.patient ? `<span class="case-link" onclick="viewPatientCase('${m.patient}')">${m.patient}</span>` : "";
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${capitalize(m.from)}</td>
+          <td>${capitalize(m.to)}</td>
+          <td>${m.text}</td>
+          <td>${patientCase}</td>
+          <td>${m.date}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+    function capitalize(str) {
+      if (!str) return "";
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+    window.viewPatientCase = function(patientName) {
+      alert('Open patient record for: ' + patientName);
+      // In real app: redirect to patients.html and scroll to patientName, or open modal with details
+    }
+
+    newMsgBtn.onclick = () => {
+      messageForm.reset();
+      modalBg.style.display = "flex";
+    }
+    closeModalBtn.onclick = cancelMessageBtn.onclick = () => {
+      modalBg.style.display = "none";
+    }
+
+    messageForm.onsubmit = function(e) {
+      e.preventDefault();
+      const msg = {
+        from: "doctor", // In real app, get from current session/role
+        to: document.getElementById('msgTo').value,
+        text: document.getElementById('msgText').value,
+        patient: document.getElementById('msgPatient').value,
+        date: new Date().toISOString().slice(0,16).replace("T"," ")
+      };
+      messages.unshift(msg);
+      renderMessages();
+      modalBg.style.display = "none";
+    }
+
+    renderMessages();
+  </script>
+</body>
+</html>

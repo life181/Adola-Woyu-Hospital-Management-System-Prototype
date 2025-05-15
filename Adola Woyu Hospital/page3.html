@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Patients | Adola Woyu Hospital</title>
+  <style>
+    body { background: #f4f8fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif;}
+    .navbar { display: flex; align-items: center; background: #2f8e85; color: #fff; padding: 1rem 1.5rem;}
+    .navbar-logo { font-weight: bold; font-size: 1.2rem; margin-right: 2rem; letter-spacing: 0.5px;}
+    .navbar-links a { color: #fff; text-decoration: none; margin: 0 1rem; font-size: 1rem;}
+    .navbar-links a.active, .navbar-links a:hover { text-decoration: underline;}
+    .navbar-user { margin-left: auto; font-size: 1rem; opacity: 0.9;}
+    .container { max-width: 1100px; margin: 2rem auto; background: #fff; border-radius: 9px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); padding: 2rem;}
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap;}
+    .page-header h2 { font-size: 1.5rem; color: #2f8e85; margin: 0;}
+    .add-btn { background: #2f8e85; color: #fff; border: none; padding: 0.65rem 1.2rem; border-radius: 6px; font-size: 1rem; cursor: pointer; font-weight: bold; transition: background 0.2s;}
+    .add-btn:hover { background: #246a63;}
+    .patients-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem;}
+    .patients-table th, .patients-table td { border: 1px solid #e0e7ef; padding: 0.7rem; text-align: left; font-size: 1rem;}
+    .patients-table th { background: #f6fcfa; color: #2f8e85; font-weight: bold;}
+    .patients-table tr:nth-child(even) { background: #f9fafc;}
+    .action-btn { background: #f3f7fb; border: none; color: #2f8e85; padding: 0.4rem 0.8rem; border-radius: 4px; margin-right: 0.4rem; cursor: pointer; font-size: 0.97rem; transition: background 0.2s;}
+    .action-btn:hover { background: #e6f8f6;}
+    .modal-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(44, 62, 80, 0.18); display: flex; align-items: center; justify-content: center; z-index: 1000; display: none;}
+    .modal { background: #fff; border-radius: 8px; box-shadow: 0 2px 16px rgba(0,0,0,0.13); padding: 2rem 1.5rem 1.2rem 1.5rem; width: 94vw; max-width: 410px; position: relative;}
+    .modal h3 { margin-top: 0; color: #2f8e85; margin-bottom: 1rem;}
+    .modal label { display: block; margin-bottom: 0.2rem; font-size: 0.98rem; color: #4e7a7b; margin-top: 0.9rem;}
+    .modal input, .modal textarea { width: 100%; padding: 0.59rem; margin-bottom: 0.7rem; border: 1px solid #cfd8dc; border-radius: 6px; font-size: 1rem; background: #f9fafc;}
+    .modal-actions { display: flex; justify-content: flex-end; gap: 1rem;}
+    .close-modal { position: absolute; top: 0.7rem; right: 1rem; font-size: 1.2rem; background: none; border: none; color: #2f8e85; cursor: pointer;}
+    @media (max-width: 700px) {
+      .container { padding: 1rem 0.3rem; margin: 1rem 0.2rem;}
+      .navbar { flex-direction: column; align-items: flex-start; padding: 0.8rem;}
+      .navbar-logo { margin-bottom: 0.6rem;}
+      .page-header { flex-direction: column; align-items: flex-start; gap: 1rem;}
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+  <span class="navbar-logo">AW</span>
+  <div class="navbar-links">
+    <a href="page1.html">Home</a>
+    <a href="page2.html">Dashboard</a>
+    <a href="page3.html" class="active">Patients</a>
+    <a href="page4.html">Appointments</a>
+    <a href="page5.html">Billing</a>
+    <a href="page6.html">Staff</a>
+    <a href="page7.html">Messages</a>
+    <a href="page8.html">Prescription</a>
+    <a href="page9.html">Certificate</a>
+    <a href="page10.html">Referral</a>
+    <a href="page11.html">Settings</a>
+    <a href="page12.html">System Admin</a>
+  </div>
+  <div class="navbar-user" id="navbarUser"></div>
+</nav>
+<script>
+  function getUsername() { return localStorage.getItem('username') || "User"; }
+  function getRole() { return localStorage.getItem('role') || "Staff"; }
+  document.getElementById('navbarUser').innerHTML = getUsername() + " (" + getRole() + ') &nbsp;|&nbsp; <a href="index.html" style="color:#fff;text-decoration:underline;">Logout</a>';
+</script>
+  <div class="container">
+    <div class="page-header">
+      <h2>Patient Management</h2>
+      <button class="add-btn" id="addPatientBtn">+ Add Patient</button>
+    </div>
+    <table class="patients-table" id="patientsTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Age</th>
+          <th>Gender</th>
+          <th>Contact</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Populated by JS -->
+      </tbody>
+    </table>
+  </div>
+  <!-- Modal for Add/Edit Patient -->
+  <div class="modal-bg" id="patientModalBg">
+    <div class="modal">
+      <button class="close-modal" id="closePatientModal">&times;</button>
+      <h3 id="modalTitle">Add Patient</h3>
+      <form id="patientForm">
+        <input type="hidden" id="patientIndex">
+        <label for="pName">Full Name</label>
+        <input type="text" id="pName" required>
+        <label for="pAge">Age</label>
+        <input type="number" id="pAge" required min="0">
+        <label for="pGender">Gender</label>
+        <input type="text" id="pGender" required>
+        <label for="pContact">Contact</label>
+        <input type="text" id="pContact" required>
+        <label for="pStatus">Status</label>
+        <input type="text" id="pStatus" required placeholder="Admitted/Discharged">
+        <label for="pHistory">Medical History</label>
+        <textarea id="pHistory" rows="2"></textarea>
+        <div class="modal-actions">
+          <button type="submit" class="add-btn" id="savePatientBtn">Save</button>
+          <button type="button" class="action-btn" id="cancelPatientBtn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+    // Demo data
+    let patients = JSON.parse(localStorage.getItem('patients')) || [
+      { name: "Alemu Kebede", age: 32, gender: "Male", contact: "0912345678", status: "Admitted", history: "Asthma" },
+      { name: "Sara Daba", age: 26, gender: "Female", contact: "0923456789", status: "Discharged", history: "No known issues" }
+    ];
+
+    const tableBody = document.querySelector('#patientsTable tbody');
+    const modalBg = document.getElementById('patientModalBg');
+    const addBtn = document.getElementById('addPatientBtn');
+    const closeModalBtn = document.getElementById('closePatientModal');
+    const patientForm = document.getElementById('patientForm');
+    const modalTitle = document.getElementById('modalTitle');
+    const patientIndex = document.getElementById('patientIndex');
+    const cancelPatientBtn = document.getElementById('cancelPatientBtn');
+    const navbarUser = document.getElementById('navbarUser');
+
+    function getUsername() {
+      return localStorage.getItem('username') || "User";
+    }
+    function getRole() {
+      return localStorage.getItem('role') || "Staff";
+    }
+    navbarUser.innerHTML = getUsername() + " (" + getRole() + ') &nbsp;|&nbsp; <a href="index.html" style="color:#fff;text-decoration:underline;">Logout</a>';
+
+    function renderPatients() {
+      tableBody.innerHTML = '';
+      patients.forEach((p, i) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${p.name}</td>
+          <td>${p.age}</td>
+          <td>${p.gender}</td>
+          <td>${p.contact}</td>
+          <td>${p.status}</td>
+          <td>
+            <button class="action-btn" onclick="editPatient(${i})">Edit</button>
+            <button class="action-btn" onclick="deletePatient(${i})">Delete</button>
+            <button class="action-btn" onclick="sendCase(${i})">Send Case</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    window.editPatient = function(index) {
+      const p = patients[index];
+      patientIndex.value = index;
+      document.getElementById('pName').value = p.name;
+      document.getElementById('pAge').value = p.age;
+      document.getElementById('pGender').value = p.gender;
+      document.getElementById('pContact').value = p.contact;
+      document.getElementById('pStatus').value = p.status;
+      document.getElementById('pHistory').value = p.history;
+      modalTitle.textContent = "Edit Patient";
+      modalBg.style.display = "flex";
+    }
+
+    window.deletePatient = function(index) {
+      if (confirm('Are you sure you want to delete this patient?')) {
+        patients.splice(index, 1);
+        savePatients();
+        renderPatients();
+      }
+    }
+
+    addBtn.onclick = () => {
+      patientIndex.value = "";
+      patientForm.reset();
+      modalTitle.textContent = "Add Patient";
+      modalBg.style.display = "flex";
+    }
+    closeModalBtn.onclick = cancelPatientBtn.onclick = () => {
+      modalBg.style.display = "none";
+    }
+
+    patientForm.onsubmit = function(e) {
+      e.preventDefault();
+      const data = {
+        name: document.getElementById('pName').value,
+        age: document.getElementById('pAge').value,
+        gender: document.getElementById('pGender').value,
+        contact: document.getElementById('pContact').value,
+        status: document.getElementById('pStatus').value,
+        history: document.getElementById('pHistory').value,
+      };
+      if (patientIndex.value === "") {
+        patients.push(data);
+      } else {
+        patients[patientIndex.value] = data;
+      }
+      savePatients();
+      renderPatients();
+      modalBg.style.display = "none";
+    }
+
+    function savePatients() {
+      localStorage.setItem('patients', JSON.stringify(patients));
+    }
+
+    // "Send Case" redirects to messages page with patient name in URL
+    window.sendCase = function(index) {
+      const p = patients[index];
+      window.location.href = "messages.html?patient=" + encodeURIComponent(p.name);
+    }
+
+    // Initial render
+    renderPatients();
+  </script>
+</body>
+</html>

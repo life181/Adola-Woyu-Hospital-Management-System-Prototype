@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Medicine Prescription | Adola Woyu Hospital</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body { background: #f4f8fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif;}
+    .navbar { display: flex; align-items: center; background: #2f8e85; color: #fff; padding: 1rem 1.5rem;}
+    .navbar-logo { font-weight: bold; font-size: 1.2rem; margin-right: 2rem;}
+    .navbar-links a { color: #fff; text-decoration: none; margin: 0 1rem;}
+    .navbar-links a.active, .navbar-links a:hover { text-decoration: underline;}
+    .navbar-user { margin-left: auto; font-size: 1rem;}
+    .container { max-width: 650px; margin: 2rem auto; padding: 2rem; background: #fff; border-radius: 10px; box-shadow: 0 2px 16px rgba(0,0,0,0.07);}
+    h2 { color: #2f8e85; margin-bottom: 1.5rem;}
+    label { display: block; margin-bottom: 0.2rem; color: #4e7a7b;}
+    input, textarea { width: 100%; padding: 0.6rem; margin-bottom: 1rem; border: 1px solid #cfd8dc; border-radius: 6px; background: #f9fafc; font-size: 1rem;}
+    .action-btn { background: #2f8e85; color: #fff; border: none; padding: 0.65rem 1.2rem; border-radius: 6px; font-size: 1rem; cursor: pointer; font-weight: bold;}
+    .action-btn:hover { background: #246a63;}
+    .pdf-preview { background: #f6fcfa; padding: 1.2rem; border-radius: 8px; margin-top: 2rem; border: 1px solid #b2e0db;}
+    .pdf-preview h3 { margin-top: 0; color: #2f8e85;}
+    @media (max-width: 700px) {.container {padding: 1rem 0.4rem; margin: 1rem 0.2rem;} .navbar {flex-direction:column; align-items:flex-start; padding:0.8rem;}}
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <span class="navbar-logo">AW</span>
+    <div class="navbar-links">
+      <a href="page1.html">Home</a>
+      <a href="page2.html">Dashboard</a>
+      <a href="page3.html">Patients</a>
+      <a href="page4.html">Appointments</a>
+      <a href="page5.html">Billing</a>
+      <a href="page6.html">Staff</a>
+      <a href="page7.html">Messages</a>
+      <a href="page8.html" class="active">Prescription</a>
+      <a href="page9.html">Certificate</a>
+      <a href="page10.html">Referral</a>
+      <a href="page11.html">Settings</a>
+      <a href="page12.html">System Admin</a>
+    </div>
+    <div class="navbar-user" id="navbarUser"></div>
+  </nav>
+  
+  <div class="container">
+    <h2>Medicine Prescription</h2>
+    <form id="prescriptionForm">
+      <label for="patientName">Patient Name</label>
+      <input type="text" id="patientName" required>
+      <label for="age">Age</label>
+      <input type="text" id="age" required>
+      <label for="gender">Gender</label>
+      <input type="text" id="gender" required>
+      <label for="medicine">Medicine(s) and Dosage</label>
+      <textarea id="medicine" rows="3" required></textarea>
+      <label for="instructions">Instructions</label>
+      <textarea id="instructions" rows="2"></textarea>
+      <button class="action-btn" type="submit">Generate Prescription</button>
+    </form>
+    
+    <div class="pdf-preview" id="pdfPreview" style="display:none;">
+      <h3>Prescription Preview</h3>
+      <div id="previewContent"></div>
+      <button class="action-btn" onclick="downloadPDF()">Download PDF</button>
+      <button class="action-btn" onclick="printPreview(document.getElementById('previewContent').innerHTML)">Print Preview</button>
+    </div>
+  </div>
+
+  <script>
+    const pdfLogoData = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAA4CAYAAADtRS0LAAABlklEQVRoge2ZUQ6DMAwFj//g/A8P8+0XxA6ErbK8Y2bF4z5m3dTUk0FJZGLcA6jz0b9iU0Ulrnlg4vSZkP7X4E2a0ZJYx9TnY8Yx0b4E8Kp8QO6hGZPz7EoI1FS4p3GzQ1Lo6K2R7ZsR9y8O+FQvQ3X4kGvm/2vQ2Iu1DOu0sX3V8z4Kf4bP8vC8O96FjZq2rI1M5VhP9vVSPZ1dGS9F7Hn4K5gYRO2pR3y2RyeV2lRKsog2j2jT8vAm2lRKt8l2j2jT8vAm2lRKt8l2j2jT8vAm2lRKt8l2j2jT8vAm2lRKt8l2j2jTf9VbIEXwzAPXnF6dKQAAAABJRU5ErkJggg==";
+
+    function getUsername() { return localStorage.getItem('username') || "Doctor"; }
+    function getRole() { return localStorage.getItem('role') || "Doctor"; }
+    document.getElementById('navbarUser').innerHTML = getUsername() + " (" + getRole() + ') &nbsp;|&nbsp; <a href="index.html" style="color:#fff;text-decoration:underline;">Logout</a>';
+
+    let pdfDoc;
+    document.getElementById('prescriptionForm').onsubmit = function(e) {
+      e.preventDefault();
+      const patient = document.getElementById('patientName').value;
+      const age = document.getElementById('age').value;
+      const gender = document.getElementById('gender').value;
+      const medicine = document.getElementById('medicine').value;
+      const instructions = document.getElementById('instructions').value;
+      const doctor = getUsername();
+      const date = new Date().toLocaleDateString();
+      let html = `
+        <img src="${pdfLogoData}" style="width:120px;margin-bottom:10px;">
+        <h2>Medicine Prescription</h2>
+        <strong>Patient Name:</strong> ${patient}<br>
+        <strong>Age:</strong> ${age}<br>
+        <strong>Gender:</strong> ${gender}<br>
+        <strong>Medicine(s):</strong> <br><pre style="background:#fff;">${medicine}</pre>
+        <strong>Instructions:</strong> <br><pre style="background:#fff;">${instructions}</pre>
+        <strong>Prescribed by:</strong> Dr. ${doctor}<br>
+        <strong>Date:</strong> ${date}
+      `;
+      document.getElementById('previewContent').innerHTML = html;
+      document.getElementById('pdfPreview').style.display = 'block';
+      pdfDoc = { patient, age, gender, medicine, instructions, doctor, date };
+    };
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.addImage(pdfLogoData, "PNG", 155, 7, 40, 25);
+      doc.setFontSize(18);
+      doc.text("Adola Woyu Hospital", 10, 15);
+      doc.setFontSize(14);
+      doc.text("Medicine Prescription", 10, 25);
+      doc.setFontSize(12);
+      doc.text(`Patient Name: ${pdfDoc.patient}`, 10, 40);
+      doc.text(`Age: ${pdfDoc.age}`, 10, 48);
+      doc.text(`Gender: ${pdfDoc.gender}`, 10, 56);
+      doc.text("Medicine(s):", 10, 66);
+      doc.text(pdfDoc.medicine, 20, 74);
+      doc.text("Instructions:", 10, 94);
+      doc.text(pdfDoc.instructions, 20, 102);
+      doc.text(`Prescribed by: Dr. ${pdfDoc.doctor}`, 10, 120);
+      doc.text(`Date: ${pdfDoc.date}`, 10, 128);
+      doc.save(`prescription_${pdfDoc.patient.replace(/\s/g, "_")}.pdf`);
+    }
+
+    function printPreview(htmlContent) {
+      const win = window.open('', '', 'width=700,height=900');
+      win.document.write(`
+        <html>
+        <head>
+          <title>Print Preview</title>
+          <style>
+            body { font-family: Arial,sans-serif; padding: 30px; }
+            .logo { width: 120px; margin-bottom: 20px; }
+            h2 { color: #2f8e85; }
+            pre { background: #f4f8fb; padding: 8px; }
+          </style>
+        </head>
+        <body>
+          <img class="logo" src="${pdfLogoData}">
+          ${htmlContent}
+          <script>window.onload = function() { window.print(); }</script>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+  </script>
+</body>
+</html>

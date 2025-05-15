@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard | Adola Woyu Hospital</title>
+  <style>
+    body { background: #f4f8fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif;}
+    .navbar { display: flex; align-items: center; background: #2f8e85; color: #fff; padding: 1rem 1.5rem;}
+    .navbar-logo { font-weight: bold; font-size: 1.2rem; margin-right: 2rem; letter-spacing: 0.5px;}
+    .navbar-links a { color: #fff; text-decoration: none; margin: 0 1rem; font-size: 1rem;}
+    .navbar-links a.active, .navbar-links a:hover { text-decoration: underline;}
+    .navbar-user { margin-left: auto; font-size: 1rem; opacity: 0.9;}
+    .container { max-width: 1200px; margin: 2rem auto; padding: 2rem; background: #fff; border-radius: 10px; box-shadow: 0 2px 16px rgba(0,0,0,0.07);}
+    h2 { color: #2f8e85; margin-bottom: 1rem;}
+    .dash-row { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 2rem;}
+    .dash-card { background: #f6fcfa; border-radius: 8px; box-shadow: 0 1px 8px rgba(44,142,133,0.07); padding: 1.3rem 1.5rem; min-width: 180px; flex: 1; text-align: center;}
+    .dash-title { color: #246a63; font-size: 1.1rem; margin-bottom: 0.4rem;}
+    .dash-value { font-size: 2.1rem; color: #2f8e85; font-weight: bold;}
+    .dash-section { margin-bottom: 2rem;}
+    .dash-table { width: 100%; border-collapse: collapse;}
+    .dash-table th, .dash-table td { border: 1px solid #e0e7ef; padding: 0.7rem; text-align: left; font-size: 1rem;}
+    .dash-table th { background: #f6fcfa; color: #2f8e85;}
+    .dash-table tr:nth-child(even) { background: #f9fafc;}
+    @media (max-width:900px){ .dash-row{ flex-direction:column; } .dash-card{ min-width:0; width:100%; } }
+    @media (max-width: 700px) {
+      .container { padding: 1rem 0.4rem; margin: 1rem 0.2rem;}
+      .navbar { flex-direction: column; align-items: flex-start; padding: 0.8rem;}
+      .navbar-logo { margin-bottom: 0.6rem;}
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+  <span class="navbar-logo">AW</span>
+  <div class="navbar-links">
+    <a href="page1.html">Home</a>
+    <a href="page2.html" class="active">Dashboard</a>
+    <a href="page3.html">Patients</a>
+    <a href="page4.html">Appointments</a>
+    <a href="page5.html">Billing</a>
+    <a href="page6.html">Staff</a>
+    <a href="page7.html">Messages</a>
+    <a href="page8.html">Prescription</a>
+    <a href="page9.html">Certificate</a>
+    <a href="page10.html">Referral</a>
+    <a href="page11.html">Settings</a>
+    <a href="page12.html">System Admin</a>
+  </div>
+  <div class="navbar-user" id="navbarUser"></div>
+</nav>
+<script>
+  function getUsername() { return localStorage.getItem('username') || "User"; }
+  function getRole() { return localStorage.getItem('role') || "Staff"; }
+  document.getElementById('navbarUser').innerHTML = getUsername() + " (" + getRole() + ') &nbsp;|&nbsp; <a href="index.html" style="color:#fff;text-decoration:underline;">Logout</a>';
+</script>
+<script>
+  function getUsername() { return localStorage.getItem('username') || "User"; }
+  function getRole() { return localStorage.getItem('role') || "Staff"; }
+  document.getElementById('navbarUser').innerHTML = getUsername() + " (" + getRole() + ') &nbsp;|&nbsp; <a href="index.html" style="color:#fff;text-decoration:underline;">Logout</a>';
+</script>
+  <div class="container">
+    <h2>System Dashboard</h2>
+    <div class="dash-row">
+      <div class="dash-card">
+        <div class="dash-title">Patients</div>
+        <div class="dash-value" id="totalPatients">0</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-title">Staff</div>
+        <div class="dash-value" id="totalStaff">0</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-title">Appointments Today</div>
+        <div class="dash-value" id="todayAppointments">0</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-title">Pending Messages</div>
+        <div class="dash-value" id="unreadMessages">0</div>
+      </div>
+    </div>
+    <div class="dash-section">
+      <h3>Recent Appointments</h3>
+      <table class="dash-table" id="apptTable">
+        <thead>
+          <tr>
+            <th>Date</th><th>Time</th><th>Patient</th><th>Doctor</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- JS -->
+        </tbody>
+      </table>
+    </div>
+    <div class="dash-section">
+      <h3>Recent Messages</h3>
+      <table class="dash-table" id="msgTable">
+        <thead>
+          <tr><th>From</th><th>To</th><th>Patient</th><th>Message</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          <!-- JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script>
+    function getUsername() { return localStorage.getItem('username') || "User"; }
+    function getRole() { return localStorage.getItem('role') || "Staff"; }
+    document.getElementById('navbarUser').innerHTML = getUsername() + " (" + getRole() + ') &nbsp;|&nbsp; <a href="index.html" style="color:#fff;text-decoration:underline;">Logout</a>';
+
+    // Dashboard stats
+    const patients = JSON.parse(localStorage.getItem('patients')) || [];
+    const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+    const staff = JSON.parse(localStorage.getItem('staff')) || [];
+    const messages = JSON.parse(localStorage.getItem('messages')) || [];
+
+    document.getElementById('totalPatients').textContent = patients.length;
+    document.getElementById('totalStaff').textContent = staff.length || "7+";
+    // Today's appointments
+    const today = new Date().toISOString().slice(0,10);
+    const todaysAppt = appointments.filter(a => a.date === today);
+    document.getElementById('todayAppointments').textContent = todaysAppt.length;
+    document.getElementById('unreadMessages').textContent = messages.length;
+
+    // Recent appointments
+    let apptRows = '';
+    appointments.slice(-5).reverse().forEach(a=>{
+      apptRows += `<tr>
+        <td>${a.date||''}</td>
+        <td>${a.time||''}</td>
+        <td>${a.patient||''}</td>
+        <td>${a.doctor||''}</td>
+        <td>${a.status||''}</td>
+      </tr>`;
+    });
+    document.getElementById('apptTable').querySelector('tbody').innerHTML = apptRows || `<tr><td colspan="5">No data</td></tr>`;
+    // Recent messages
+    let msgRows = '';
+    messages.slice(0,5).forEach(m=>{
+      msgRows += `<tr>
+        <td>${m.from||''}</td>
+        <td>${m.to||''}</td>
+        <td>${m.patient||''}</td>
+        <td>${m.text||''}</td>
+        <td>${m.date||''}</td>
+      </tr>`;
+    });
+    document.getElementById('msgTable').querySelector('tbody').innerHTML = msgRows || `<tr><td colspan="5">No data</td></tr>`;
+  </script>
+</body>
+</html>

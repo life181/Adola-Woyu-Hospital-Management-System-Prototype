@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Appointments | Adola Woyu Hospital</title>
+  <style>
+    body { background: #f4f8fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif;}
+    .navbar { display: flex; align-items: center; background: #2f8e85; color: #fff; padding: 1rem 1.5rem;}
+    .navbar-logo { font-weight: bold; font-size: 1.2rem; margin-right: 2rem; letter-spacing: 0.5px;}
+    .navbar-links a { color: #fff; text-decoration: none; margin: 0 1rem; font-size: 1rem;}
+    .navbar-links a.active, .navbar-links a:hover { text-decoration: underline;}
+    .navbar-user { margin-left: auto; font-size: 1rem; opacity: 0.9;}
+    .container { max-width: 900px; margin: 2rem auto; background: #fff; border-radius: 9px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); padding: 2rem;}
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap;}
+    .page-header h2 { font-size: 1.5rem; color: #2f8e85; margin: 0;}
+    .add-btn { background: #2f8e85; color: #fff; border: none; padding: 0.65rem 1.2rem; border-radius: 6px; font-size: 1rem; cursor: pointer; font-weight: bold;}
+    .add-btn:hover { background: #246a63;}
+    .appointments-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem;}
+    .appointments-table th, .appointments-table td { border: 1px solid #e0e7ef; padding: 0.7rem; text-align: left; font-size: 1rem;}
+    .appointments-table th { background: #f6fcfa; color: #2f8e85; font-weight: bold;}
+    .appointments-table tr:nth-child(even) { background: #f9fafc;}
+    .action-btn { background: #f3f7fb; border: none; color: #2f8e85; padding: 0.4rem 0.8rem; border-radius: 4px; margin-right: 0.4rem; cursor: pointer;}
+    .action-btn:hover { background: #e6f8f6;}
+    .modal-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(44, 62, 80, 0.18); display: flex; align-items: center; justify-content: center; z-index: 1000; display: none;}
+    .modal { background: #fff; border-radius: 8px; box-shadow: 0 2px 16px rgba(0,0,0,0.13); padding: 2rem 1.5rem 1.2rem 1.5rem; width: 94vw; max-width: 410px; position: relative;}
+    .modal h3 { margin-top: 0; color: #2f8e85; margin-bottom: 1rem;}
+    .modal label { display: block; margin-bottom: 0.2rem; font-size: 0.98rem; color: #4e7a7b; margin-top: 0.9rem;}
+    .modal input, .modal select, .modal textarea { width: 100%; padding: 0.59rem; margin-bottom: 0.7rem; border: 1px solid #cfd8dc; border-radius: 6px; font-size: 1rem; background: #f9fafc;}
+    .modal-actions { display: flex; justify-content: flex-end; gap: 1rem;}
+    .close-modal { position: absolute; top: 0.7rem; right: 1rem; font-size: 1.2rem; background: none; border: none; color: #2f8e85; cursor: pointer;}
+    @media (max-width: 700px) {
+      .container { padding: 1rem 0.4rem; margin: 1rem 0.2rem;}
+      .navbar { flex-direction: column; align-items: flex-start; padding: 0.8rem;}
+      .navbar-logo { margin-bottom: 0.6rem;}
+      .page-header { flex-direction: column; align-items: flex-start; gap: 1rem;}
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+  <span class="navbar-logo">AW</span>
+  <div class="navbar-links">
+    <a href="page1.html">Home</a>
+    <a href="page2.html">Dashboard</a>
+    <a href="page3.html">Patients</a>
+    <a href="page4.html" class="active">Appointments</a>
+    <a href="page5.html">Billing</a>
+    <a href="page6.html">Staff</a>
+    <a href="page7.html">Messages</a>
+    <a href="page8.html">Prescription</a>
+    <a href="page9.html">Certificate</a>
+    <a href="page10.html">Referral</a>
+    <a href="page11.html">Settings</a>
+    <a href="page12.html">System Admin</a>
+  </div>
+  <div class="navbar-user" id="navbarUser"></div>
+</nav>
+<script>
+  function getUsername() { return localStorage.getItem('username') || "User"; }
+  function getRole() { return localStorage.getItem('role') || "Staff"; }
+  document.getElementById('navbarUser').innerHTML = getUsername() + " (" + getRole() + ') &nbsp;|&nbsp; <a href="index.html" style="color:#fff;text-decoration:underline;">Logout</a>';
+</script>
+  <div class="container">
+    <div class="page-header">
+      <h2>Appointments</h2>
+      <button class="add-btn" id="addAppointmentBtn">+ Book Appointment</button>
+    </div>
+    <table class="appointments-table" id="appointmentsTable">
+      <thead>
+        <tr>
+          <th>Patient</th>
+          <th>Doctor</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Reason</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Populated by JS -->
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-bg" id="appointmentModalBg">
+    <div class="modal">
+      <button class="close-modal" id="closeAppointmentModal">&times;</button>
+      <h3 id="appointmentModalTitle">Book Appointment</h3>
+      <form id="appointmentForm">
+        <input type="hidden" id="appointmentIndex">
+        <label for="aPatient">Patient Name</label>
+        <input type="text" id="aPatient" required>
+        <label for="aDoctor">Doctor Name</label>
+        <input type="text" id="aDoctor" required>
+        <label for="aDate">Date</label>
+        <input type="date" id="aDate" required>
+        <label for="aTime">Time</label>
+        <input type="time" id="aTime" required>
+        <label for="aReason">Reason</label>
+        <input type="text" id="aReason" required>
+        <label for="aStatus">Status</label>
+        <select id="aStatus" required>
+          <option value="Scheduled">Scheduled</option>
+          <option value="Completed">Completed</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+        <div class="modal-actions">
+          <button type="submit" class="add-btn" id="saveAppointmentBtn">Save</button>
+          <button type="button" class="action-btn" id="cancelAppointmentBtn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+    let appointments = JSON.parse(localStorage.getItem('appointments')) || [
+      { patient: "Alemu Kebede", doctor: "Dr. Example", date: "2025-05-10", time: "10:00", reason: "Checkup", status: "Scheduled" },
+      { patient: "Sara Daba", doctor: "Dr. Example", date: "2025-05-12", time: "13:30", reason: "Follow up", status: "Completed" }
+    ];
+
+    const tableBody = document.querySelector('#appointmentsTable tbody');
+    const modalBg = document.getElementById('appointmentModalBg');
+    const addBtn = document.getElementById('addAppointmentBtn');
+    const closeModalBtn = document.getElementById('closeAppointmentModal');
+    const appointmentForm = document.getElementById('appointmentForm');
+    const modalTitle = document.getElementById('appointmentModalTitle');
+    const appointmentIndex = document.getElementById('appointmentIndex');
+    const cancelAppointmentBtn = document.getElementById('cancelAppointmentBtn');
+    const navbarUser = document.getElementById('navbarUser');
+
+    function getUsername() {
+      return localStorage.getItem('username') || "User";
+    }
+    function getRole() {
+      return localStorage.getItem('role') || "Staff";
+    }
+    navbarUser.innerHTML = getUsername() + " (" + getRole() + ') &nbsp;|&nbsp; <a href="index.html" style="color:#fff;text-decoration:underline;">Logout</a>';
+
+    function renderAppointments() {
+      tableBody.innerHTML = '';
+      appointments.forEach((a, i) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${a.patient}</td>
+          <td>${a.doctor}</td>
+          <td>${a.date}</td>
+          <td>${a.time}</td>
+          <td>${a.reason}</td>
+          <td>${a.status}</td>
+          <td>
+            <button class="action-btn" onclick="editAppointment(${i})">Edit</button>
+            <button class="action-btn" onclick="deleteAppointment(${i})">Delete</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    window.editAppointment = function(index) {
+      const a = appointments[index];
+      appointmentIndex.value = index;
+      document.getElementById('aPatient').value = a.patient;
+      document.getElementById('aDoctor').value = a.doctor;
+      document.getElementById('aDate').value = a.date;
+      document.getElementById('aTime').value = a.time;
+      document.getElementById('aReason').value = a.reason;
+      document.getElementById('aStatus').value = a.status;
+      modalTitle.textContent = "Edit Appointment";
+      modalBg.style.display = "flex";
+    }
+
+    window.deleteAppointment = function(index) {
+      if (confirm('Are you sure you want to delete this appointment?')) {
+        appointments.splice(index, 1);
+        saveAppointments();
+        renderAppointments();
+      }
+    }
+
+    addBtn.onclick = () => {
+      appointmentIndex.value = "";
+      appointmentForm.reset();
+      modalTitle.textContent = "Book Appointment";
+      modalBg.style.display = "flex";
+    }
+    closeModalBtn.onclick = cancelAppointmentBtn.onclick = () => {
+      modalBg.style.display = "none";
+    }
+
+    appointmentForm.onsubmit = function(e) {
+      e.preventDefault();
+      const data = {
+        patient: document.getElementById('aPatient').value,
+        doctor: document.getElementById('aDoctor').value,
+        date: document.getElementById('aDate').value,
+        time: document.getElementById('aTime').value,
+        reason: document.getElementById('aReason').value,
+        status: document.getElementById('aStatus').value
+      };
+      if (appointmentIndex.value === "") {
+        appointments.push(data);
+      } else {
+        appointments[appointmentIndex.value] = data;
+      }
+      saveAppointments();
+      renderAppointments();
+      modalBg.style.display = "none";
+    }
+
+    function saveAppointments() {
+      localStorage.setItem('appointments', JSON.stringify(appointments));
+    }
+
+    // Initial render
+    renderAppointments();
+  </script>
+</body>
+</html>

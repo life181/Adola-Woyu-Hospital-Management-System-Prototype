@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Settings | Adola Woyu Hospital</title>
+  <style>
+    body { background: #f4f8fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif;}
+    .navbar { display: flex; align-items: center; background: #2f8e85; color: #fff; padding: 1rem 1.5rem;}
+    .navbar-logo { font-weight: bold; font-size: 1.2rem; margin-right: 2rem; letter-spacing: 0.5px;}
+    .navbar-links a { color: #fff; text-decoration: none; margin: 0 1rem; font-size: 1rem;}
+    .navbar-links a.active, .navbar-links a:hover { text-decoration: underline;}
+    .navbar-user { margin-left: auto; font-size: 1rem; opacity: 0.9;}
+    .container { max-width: 650px; margin: 2rem auto; padding: 2rem; background: #fff; border-radius: 10px; box-shadow: 0 2px 16px rgba(0,0,0,0.07);}
+    h2 { color: #2f8e85; margin-bottom: 1.5rem;}
+    .settings-section { margin-bottom: 2.3rem; }
+    .settings-section h3 { color: #246a63; margin-bottom: 0.8rem; font-size: 1.12rem;}
+    label { display: block; margin-bottom: 0.2rem; color: #4e7a7b; }
+    input[type="text"], input[type="password"], input[type="email"], select {
+      width: 100%; padding: 0.6rem; margin-bottom: 1rem; border: 1px solid #cfd8dc; border-radius: 6px; font-size: 1rem; background: #f9fafc;
+    }
+    .save-btn { background: #2f8e85; color: #fff; border: none; padding: 0.65rem 1.2rem; border-radius: 6px; font-size: 1rem; cursor: pointer; font-weight: bold; }
+    .save-btn:hover { background: #246a63;}
+    .success-msg { color: #2f8e85; margin-bottom: 1rem; }
+    @media (max-width: 700px) {
+      .container { padding: 1rem 0.4rem; margin: 1rem 0.2rem;}
+      .navbar { flex-direction: column; align-items: flex-start; padding: 0.8rem;}
+      .navbar-logo { margin-bottom: 0.6rem;}
+    }
+  </style>
+</head>
+<body>
+ <nav class="navbar">
+  <span class="navbar-logo">AW</span>
+  <div class="navbar-links">
+    <a href="page1.html">Home</a>
+    <a href="page2.html">Dashboard</a>
+    <a href="page3.html">Patients</a>
+    <a href="page4.html">Appointments</a>
+    <a href="page5.html">Billing</a>
+    <a href="page6.html">Staff</a>
+    <a href="page7.html">Messages</a>
+    <a href="page8.html">Prescription</a>
+    <a href="page9.html">Certificate</a>
+    <a href="page10.html">Referral</a>
+    <a href="page11.html" class="active">Settings</a>
+    <a href="page12.html">System Admin</a>
+  </div>
+  <div class="navbar-user" id="navbarUser"></div>
+</nav>
+<script>
+  function getUsername() { return localStorage.getItem('username') || "User"; }
+  function getRole() { return localStorage.getItem('role') || "Staff"; }
+  document.getElementById('navbarUser').innerHTML = getUsername() + " (" + getRole() + ') &nbsp;|&nbsp; <a href="index.html" style="color:#fff;text-decoration:underline;">Logout</a>';
+</script>
+  <div class="container">
+    <h2>Settings</h2>
+    <div class="settings-section">
+      <h3>Profile Information</h3>
+      <form id="profileForm">
+        <label for="sName">Full Name</label>
+        <input type="text" id="sName" required>
+        <label for="sEmail">Email</label>
+        <input type="email" id="sEmail" required>
+        <label for="sRole">Role</label>
+        <input type="text" id="sRole" disabled>
+        <button class="save-btn" type="submit">Save Profile</button>
+        <div class="success-msg" id="profileSuccess" style="display:none;">Profile updated!</div>
+      </form>
+    </div>
+    <div class="settings-section">
+      <h3>Change Password</h3>
+      <form id="passwordForm">
+        <label for="currentPwd">Current Password</label>
+        <input type="password" id="currentPwd" required>
+        <label for="newPwd">New Password</label>
+        <input type="password" id="newPwd" required>
+        <label for="confirmPwd">Confirm New Password</label>
+        <input type="password" id="confirmPwd" required>
+        <button class="save-btn" type="submit">Update Password</button>
+        <div class="success-msg" id="pwdSuccess" style="display:none;">Password updated!</div>
+      </form>
+    </div>
+    <div class="settings-section">
+      <h3>Preferences</h3>
+      <form id="prefsForm">
+        <label for="theme">Theme</label>
+        <select id="theme">
+          <option value="default">Default</option>
+          <option value="dark">Dark</option>
+        </select>
+        <button class="save-btn" type="submit">Save Preferences</button>
+        <div class="success-msg" id="prefSuccess" style="display:none;">Preferences saved!</div>
+      </form>
+    </div>
+  </div>
+  <script>
+    function getUsername() {
+      return localStorage.getItem('username') || "User";
+    }
+    function getRole() {
+      return localStorage.getItem('role') || "Staff";
+    }
+    document.getElementById('navbarUser').innerHTML = getUsername() + " (" + getRole() + ') &nbsp;|&nbsp; <a href="index.html" style="color:#fff;text-decoration:underline;">Logout</a>';
+    // Prefill profile
+    document.getElementById('sName').value = getUsername();
+    document.getElementById('sEmail').value = localStorage.getItem('email') || '';
+    document.getElementById('sRole').value = getRole();
+
+    // Profile save
+    document.getElementById('profileForm').onsubmit = function(e){
+      e.preventDefault();
+      localStorage.setItem('username', document.getElementById('sName').value);
+      localStorage.setItem('email', document.getElementById('sEmail').value);
+      document.getElementById('profileSuccess').style.display = 'block';
+      setTimeout(()=>{document.getElementById('profileSuccess').style.display='none';}, 1500);
+    }
+    // Password
+    document.getElementById('passwordForm').onsubmit = function(e){
+      e.preventDefault();
+      let n1 = document.getElementById('newPwd').value;
+      let n2 = document.getElementById('confirmPwd').value;
+      if(n1 !== n2){
+        alert("Passwords do not match!");
+        return false;
+      }
+      // (Not secure - just demo)
+      document.getElementById('pwdSuccess').style.display = 'block';
+      setTimeout(()=>{document.getElementById('pwdSuccess').style.display='none';}, 1500);
+      document.getElementById('passwordForm').reset();
+    }
+    // Preferences
+    document.getElementById('prefsForm').onsubmit = function(e){
+      e.preventDefault();
+      document.getElementById('prefSuccess').style.display = 'block';
+      setTimeout(()=>{document.getElementById('prefSuccess').style.display='none';}, 1500);
+    }
+  </script>
+</body>
+</html>

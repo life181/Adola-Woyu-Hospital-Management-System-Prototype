@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Referral | Adola Woyu Hospital</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body { background: #f4f8fb; margin: 0; font-family: 'Segoe UI', Arial, sans-serif;}
+    .navbar { display: flex; align-items: center; background: #2f8e85; color: #fff; padding: 1rem 1.5rem;}
+    .navbar-logo { font-weight: bold; font-size: 1.2rem; margin-right: 2rem;}
+    .navbar-links a { color: #fff; text-decoration: none; margin: 0 1rem;}
+    .navbar-links a.active, .navbar-links a:hover { text-decoration: underline;}
+    .navbar-user { margin-left: auto; font-size: 1rem;}
+    .container { max-width: 650px; margin: 2rem auto; padding: 2rem; background: #fff; border-radius: 10px; box-shadow: 0 2px 16px rgba(0,0,0,0.07);}
+    h2 { color: #2f8e85; margin-bottom: 1.5rem;}
+    label { display: block; margin-bottom: 0.2rem; color: #4e7a7b;}
+    input, textarea { width: 100%; padding: 0.6rem; margin-bottom: 1rem; border: 1px solid #cfd8dc; border-radius: 6px; background: #f9fafc; font-size: 1rem;}
+    .action-btn { background: #2f8e85; color: #fff; border: none; padding: 0.65rem 1.2rem; border-radius: 6px; font-size: 1rem; cursor: pointer; font-weight: bold;}
+    .action-btn:hover { background: #246a63;}
+    .pdf-preview { background: #f6fcfa; padding: 1.2rem; border-radius: 8px; margin-top: 2rem; border: 1px solid #b2e0db;}
+    .pdf-preview h3 { margin-top: 0; color: #2f8e85;}
+    @media (max-width: 700px) {.container {padding: 1rem 0.4rem; margin: 1rem 0.2rem;} .navbar {flex-direction:column; align-items:flex-start; padding:0.8rem;}}
+  </style>
+</head>
+<body>
+ <nav class="navbar">
+  <span class="navbar-logo">AW</span>
+  <div class="navbar-links">
+    <a href="page1.html">Home</a>
+    <a href="page2.html">Dashboard</a>
+    <a href="page3.html">Patients</a>
+    <a href="page4.html">Appointments</a>
+    <a href="page5.html">Billing</a>
+    <a href="page6.html">Staff</a>
+    <a href="page7.html">Messages</a>
+    <a href="page8.html">Prescription</a>
+    <a href="page9.html">Certificate</a>
+    <a href="page10.html" class="active">Referral</a>
+    <a href="page11.html">Settings</a>
+    <a href="page12.html">System Admin</a>
+  </div>
+  <div class="navbar-user" id="navbarUser"></div>
+</nav>
+<script>
+  function getUsername() { return localStorage.getItem('username') || "User"; }
+  function getRole() { return localStorage.getItem('role') || "Staff"; }
+  document.getElementById('navbarUser').innerHTML = getUsername() + " (" + getRole() + ') &nbsp;|&nbsp; <a href="index.html" style="color:#fff;text-decoration:underline;">Logout</a>';
+</script>
+  <div class="container">
+    <h2>Patient Referral</h2>
+    <form id="referralForm">
+      <label for="patientName">Patient Name</label>
+      <input type="text" id="patientName" required>
+      <label for="age">Age</label>
+      <input type="text" id="age" required>
+      <label for="gender">Gender</label>
+      <input type="text" id="gender" required>
+      <label for="toFacility">Referral To (Facility/Doctor)</label>
+      <input type="text" id="toFacility" required>
+      <label for="refReason">Reason for Referral</label>
+      <textarea id="refReason" rows="2" required></textarea>
+      <label for="summary">Summary/Findings</label>
+      <textarea id="summary" rows="2"></textarea>
+      <button class="action-btn" type="submit">Generate Referral</button>
+    </form>
+    <div class="pdf-preview" id="pdfPreview" style="display:none;">
+      <h3>Referral Preview</h3>
+      <div id="previewContent"></div>
+      <button class="action-btn" onclick="downloadPDF()">Download PDF</button>
+      <button class="action-btn" onclick="printPDF()">Print PDF</button>
+    </div>
+  </div>
+
+  <script>
+
+// Place this at the top of your JS (pdfLogoData is a tiny image for demonstration)
+const pdfLogoData = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAA4CAYAAADtRS0LAAABlklEQVRoge2ZUQ6DMAwFj//g/A8P8+0XxA6ErbK8Y2bF4z5m3dTUk0FJZGLcA6jz0b9iU0Ulrnlg4vSZkP7X4E2a0ZJYx9TnY8Yx0b4E8Kp8QO6hGZPz7EoI1FS4p3GzQ1Lo6K2R7ZsR9y8O+FQvQ3X4kGvm/2vQ2Iu1DOu0sX3V8z4Kf4bP8vC8O96FjZq2rI1M5VhP9vVSPZ1dGS9F7Hn4K5gYRO2pR3y2RyeV2lRKsog2j2jT8vAm2lRKt8l2j2jT8vAm2lRKt8l2j2jT8vAm2lRKt8l2j2jT8vAm2lRKt8l2j2jT8vAm2lRKt8l2j2jT8vAm2lRKt8l2j2jTf9VbIEXwzAPXnF6dKQAAAABJRU5ErkJggg==";
+doc.addImage(pdfLogoData, "PNG", 155, 7, 40, 25); // (img, type, x, y, width, height)
+
+    function getUsername() { return localStorage.getItem('username') || "Doctor"; }
+    function getRole() { return localStorage.getItem('role') || "Doctor"; }
+    document.getElementById('navbarUser').innerHTML = getUsername() + " (" + getRole() + ') &nbsp;|&nbsp; <a href="index.html" style="color:#fff;text-decoration:underline;">Logout</a>';
+    let pdfDoc;
+    document.getElementById('referralForm').onsubmit = function(e){
+      e.preventDefault();
+      const patient = document.getElementById('patientName').value;
+      const age = document.getElementById('age').value;
+      const gender = document.getElementById('gender').value;
+      const toFacility = document.getElementById('toFacility').value;
+      const refReason = document.getElementById('refReason').value;
+      const summary = document.getElementById('summary').value;
+      const doctor = getUsername();
+      const date = new Date().toLocaleDateString();
+      let html = `
+        <strong>Patient Name:</strong> ${patient}<br>
+        <strong>Age:</strong> ${age}<br>
+        <strong>Gender:</strong> ${gender}<br>
+        <strong>Referral To:</strong> ${toFacility}<br>
+        <strong>Reason:</strong> ${refReason}<br>
+        <strong>Summary/Findings:</strong> ${summary}<br>
+        <strong>Referred by:</strong> Dr. ${doctor}<br>
+        <strong>Date:</strong> ${date}
+      `;
+      document.getElementById('previewContent').innerHTML = html;
+      document.getElementById('pdfPreview').style.display = 'block';
+      pdfDoc = { patient, age, gender, toFacility, refReason, summary, doctor, date };
+    }
+    function downloadPDF(){
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(18);
+      doc.text("Adola Woyu Hospital", 10, 15);
+      doc.setFontSize(14);
+      doc.text("Patient Referral", 10, 25);
+      doc.setFontSize(12);
+      doc.text(`Patient Name: ${pdfDoc.patient}`, 10, 38);
+      doc.text(`Age: ${pdfDoc.age}`, 10, 46);
+      doc.text(`Gender: ${pdfDoc.gender}`, 10, 54);
+      doc.text(`Referral To: ${pdfDoc.toFacility}`, 10, 62);
+      doc.text(`Reason: ${pdfDoc.refReason}`, 10, 72);
+      doc.text(`Summary: ${pdfDoc.summary}`, 10, 82);
+      doc.text(`Referred by: Dr. ${pdfDoc.doctor}`, 10, 96);
+      doc.text(`Date: ${pdfDoc.date}`, 10, 104);
+      doc.save(`referral_${pdfDoc.patient.replace(/\s/g, "_")}.pdf`);
+    }
+    
+    function printPDF(){
+      downloadPDF();
+      setTimeout(()=>{
+        window.open(document.querySelector('a[download]').href);
+      },300);
+    }
+  </script>
+</body>
+</html>
